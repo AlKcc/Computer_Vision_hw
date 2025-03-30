@@ -47,6 +47,9 @@ def crop_image(image, start_row, start_col, num_rows, num_cols):
 
     ### YOUR CODE HERE
     pass
+    end_row = start_row + num_rows
+    end_col = start_col + num_cols
+    out = image[start_row:end_row, start_col:end_col, :]
     ### END YOUR CODE
 
     return out
@@ -70,6 +73,7 @@ def dim_image(image):
 
     ### YOUR CODE HERE
     pass
+    out = 0.5 * (image * image)
     ### END YOUR CODE
 
     return out
@@ -98,6 +102,13 @@ def resize_image(input_image, output_rows, output_cols):
 
     ### YOUR CODE HERE
     pass
+    row_scale_factor = input_rows / output_rows
+    col_scale_factor = input_cols / output_cols
+    for i in range(output_rows):
+        for j in range(output_cols):
+            input_i = int(i * row_scale_factor)
+            input_j = int(j * col_scale_factor)
+            output_image[i, j, :] = input_image[input_i, input_j, :]
     ### END YOUR CODE
 
     # 3. Return the output image
@@ -121,6 +132,10 @@ def rotate2d(point, theta):
 
     ## YOUR CODE HERE
     pass
+    x, y = point
+    nx = x * np.cos(theta) - y * np.sin(theta)
+    ny = x * np.sin(theta) + y * np.cos(theta)
+    return np.array([nx, ny])
     ### END YOUR CODE
 
 
@@ -143,6 +158,25 @@ def rotate_image(input_image, theta):
 
     ## YOUR CODE HERE
     pass
+    #计算中心点坐标
+    center_x = (input_rows - 1) / 2
+    center_y = (input_cols - 1) / 2
+    
+    for i in range(input_rows):
+        for j in range(input_cols):
+            # 将当前像素坐标转换为相对于图像中心的坐标
+            x_relative = j - center_x
+            y_relative = i - center_y
+            # 旋转坐标
+            rotated_point = rotate2d(np.array([x_relative, y_relative]), -theta)
+            x_rotated_relative, y_rotated_relative = rotated_point
+            # 再转换回原始坐标系统
+            x_rotated = int(x_rotated_relative + center_x)
+            y_rotated = int(y_rotated_relative + center_y)
+            # 检查旋转后的坐标是否在有效范围内
+            if 0 <= x_rotated < input_cols and 0 <= y_rotated < input_rows:
+                output_image[i, j, :] = input_image[y_rotated, x_rotated, :]
+                
     ### END YOUR CODE
 
     # 3. Return the output image
